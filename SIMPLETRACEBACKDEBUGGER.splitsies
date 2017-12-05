@@ -1,0 +1,96 @@
+_?c
+#ifndef __SIMPLETRACEBACKDEBUGGER_INCLUDED__
+#define __SIMPLETRACEBACKDEBUGGER_INCLUDED__
+
+#include <iostream>
+#include <vector>
+#include <exception>
+#include <csignal>
+#include <cstdlib>
+_?C
+
+_?h
+#include "SIMPLETRACEBACKDEBUGGER.h"
+_?H
+
+using namespace std;
+
+namespace SIMPLETRACEBACKDEBUGGER {
+
+  _?c
+  struct datapoint {
+    const char * fdata;
+    unsigned long long linenum;
+  };
+  _?C
+
+  _?c
+  vector<datapoint> stack;
+  _?C
+
+  void update(unsigned long long ln) _?f {
+    stack.back().linenum = ln;
+  } _?F
+
+  _?r2coin::;
+
+  _?c
+  class coin {
+    public:
+      bool one_byte_of_memory;
+      _?C
+      _?2coin(const char * fdata) _?f {
+        datapoint dp;
+        dp.fdata = fdata;
+        dp.linenum = 0;
+        stack.push_back(dp);
+      } _?F
+      _?2~coin() _?f {
+        stack.pop_back();
+      } _?F
+      _?c
+  };
+  _?C
+
+  void do_traceback() _?f {
+    cout << endl << endl;
+    cout << "START ERROR TRACEBACK" << endl;
+    for (unsigned long long i=0;i<stack.size();i++) {
+      cout << stack[i].fdata << " : " << stack[i].linenum << endl;
+    }
+    cout << "END ERROR TRACEBACK" << endl;
+  } _?F
+
+  void deal_with_exceptions() _?f {
+    do_traceback();
+    cout << "..." << endl;
+    cout << "UNCAUGHT EXCEPTION";
+    exit(0);
+  } _?F
+
+  void deal_with_segfault(int err) _?f {
+    do_traceback();
+    cout << "..." << endl;
+    cout << "SEGFAULT";
+    exit(0);
+  } _?F
+
+  _?r2setup::;
+
+  _?c
+  class setup {
+    public:
+      _?C
+      _?2setup() _?f {
+        set_terminate(deal_with_exceptions);
+        signal(SIGSEGV,deal_with_segfault);
+      } _?F
+      _?c
+  };
+  _?C
+
+}
+
+_?c
+#endif
+_?C
